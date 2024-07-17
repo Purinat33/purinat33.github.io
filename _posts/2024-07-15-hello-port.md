@@ -1,7 +1,7 @@
 ---
 title: Welcome to my Portfolio
 date: 2024-07-15 12:00:00
-categories: [misc, general]
+categories: [Personal]
 tags: [portfolio, showcase, project]
 ---
 
