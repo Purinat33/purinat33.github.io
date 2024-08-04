@@ -1,5 +1,5 @@
 ---
-title: "Image Hiding using Stenography"
+title: "File Encryption Technique"
 categories: [Cybersecurity, Encryption]
 ---
 
