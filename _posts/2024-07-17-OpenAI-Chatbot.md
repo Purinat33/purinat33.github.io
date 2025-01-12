@@ -11,6 +11,7 @@ tags: [OpenAI, RAG, Langchain, LlamaIndex, PDF]
 When, instead of supplying only the prompt to an LLM, which can lead to what is called **Hallucination**, we also give an LLM a relevant context to take answers from.
 
 ![alt text](https://cdn.prod.website-files.com/618399cd49d125734c8dec95/66b9d89de0acf0da3e10a039_64f96acdb54fef43d33ef1ad_rag.png)
+
 [Image Sorce](https://www.hopsworks.ai/dictionary/retrieval-augmented-generation-llm)
 
 ## Project
