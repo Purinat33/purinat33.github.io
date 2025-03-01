@@ -1,5 +1,5 @@
 ---
-title: Weather Report GUI application
+title: "Weather Report GUI application"
 categories: [Software Development, Small Application]
 ---
 
