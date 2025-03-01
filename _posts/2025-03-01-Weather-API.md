@@ -1,6 +1,6 @@
 ---
 title: Weather Report GUI application
-categories: [Software Development]
+categories: [Software Development, Small Application]
 ---
 
 # Weather Report GUI App: A Practical Project
