@@ -1,6 +1,7 @@
 ---
 title: Welcome to my Portfolio
 categories: [Personal]
+pin: true
 tags: [portfolio, showcase, project]
 ---
 
