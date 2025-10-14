@@ -2,6 +2,7 @@
 title: Welcome to my Portfolio
 categories: [Personal]
 pin: true
+date: 2024-07-15 12:00:00
 tags: [portfolio, showcase, project]
 ---
 
