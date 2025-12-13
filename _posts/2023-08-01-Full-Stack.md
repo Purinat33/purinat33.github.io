@@ -1,78 +1,141 @@
 ---
 title: "Full Stack Game Store Application"
 categories: [Software Development, Full-Stack Web Application]
+# Keep your existing date exactly as-is (either in filename or a `date:` field if you already have one).
+toc: true
+mermaid: true
 ---
 
-# Building a Full-Stack Web Application with Frontend-Backend Independence
+# Full Stack Game Store Application
+
+A full-stack game store web app with a decoupled frontend, REST API backend, MySQL persistence, JWT authentication, and Stripe test-mode checkout.
+
+- Source code: [itcs212_web-server](https://github.com/Purinat33/itcs212_web-server)
+- Tech focus: frontend-backend independence, auth security basics, payment flow design, relational data modeling
+
+> If I had 30 seconds to explain this project: I built an e-commerce-style flow (browse → cart → checkout) with a separate frontend and backend communicating via HTTP, including user authentication and test payments.
+
+---
+
+## Project at a glance
+
+| Item                   | Details                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| Type                   | Full-stack web application (class project)                                           |
+| Architecture           | Decoupled frontend + REST API backend                                                |
+| Backend                | Node.js (Express), MySQL                                                             |
+| Auth                   | bcrypt password hashing + JWT                                                        |
+| Payments               | Stripe test mode (mock / sandbox payments)                                           |
+| What this demonstrates | API design, security fundamentals, database integration, end-to-end feature delivery |
+
+---
 
 ## Overview
 
-I recently worked on a personal project to develop a **full-stack web application** where the frontend and backend function independently while communicating through the Fetch API. The project integrates multiple key features, including:
+I developed a full-stack web application where the **frontend and backend are fully independent** and communicate through HTTP requests (Fetch API). The app supports:
 
-- **Frontend-Backend Independence** using the Fetch API
-- **Stripe Mock Payment System** for payment processing
-- **MySQL Database Integration** for persistent storage
-- **Full Authentication System** with user management
-
-This project showcases a modular and scalable approach to modern web development. You can find the source code on **GitHub**: [itcs212_web-server](https://github.com/Purinat33/itcs212_web-server).
+- User registration and login with **JWT-based authentication**
+- Protected routes for authenticated actions
+- Cart and checkout flow with **Stripe test-mode payments**
+- Persistent storage with **MySQL** for users, products, and cart data
 
 ---
 
-## Tech Stack
+## Architecture
 
-### Frontend:
+```mermaid
+flowchart LR
+  UI[Frontend HTML/CSS/JS] -->|Fetch API| API[Backend Node.js + Express]
+  API --> DB[(MySQL)]
+  API --> Stripe[Stripe Test Mode]
+```
 
-- **HTML, CSS, JavaScript** – Core technologies for building the UI
-- **Fetch API** – To interact with the backend asynchronously
+### Why this architecture?
 
-### Backend:
+Keeping the frontend and backend separate makes the project more realistic and scalable:
 
-- **Node.js (Express.js)** – To handle API requests and business logic
-- **MySQL** – For database management and persistent data storage
-- **bcrypt.js & JWT** – For secure authentication
-- **Stripe Mock API** – For handling test payments
+- The backend can serve multiple clients (web, mobile, admin tool).
+- API endpoints become a clean contract.
+- UI changes don’t require server rewrites (and vice versa).
 
 ---
 
-## Key Features
+## Tech stack
 
-### 1. Frontend-Backend Independence
+### Frontend
 
-The frontend is designed to be completely separate from the backend, communicating via the `fetch` API. This improves modularity, allowing easy modifications to either component without breaking the system.
+- HTML, CSS, JavaScript
+- Fetch API for async requests to backend endpoints
 
-Example Fetch API call:
+### Backend
+
+- Node.js (Express) for routing and business logic
+- MySQL for relational storage
+- bcrypt.js + JWT for auth
+- Stripe test mode for checkout session creation
+
+---
+
+## Key features (with engineering decisions)
+
+## 1) Frontend–backend independence via Fetch API
+
+The frontend sends JSON to the backend and handles responses cleanly. Example: registration call.
 
 ```javascript
 const response = await fetch("http://localhost:80/auth/register", {
-  method: "POST", //Use HTTP POST method
-  headers: {
-    "Content-Type": "application/json", //Set content type of request to JSON
-  },
-  body: JSON.stringify({ username, password }), //Convert username and password to JSON string and set as request body
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username, password }),
 });
+
+const data = await response.json();
+if (!response.ok) {
+  // Display a user-friendly message instead of failing silently
+  console.error(data.message || "Registration failed");
+}
 ```
 
-### 2. Secure Authentication System
+**What this shows**
 
-The application uses **JWT (JSON Web Tokens)** for secure authentication and **bcrypt.js** for password hashing.
+- You understand client/server boundaries
+- You can build an API-driven UI (a common real-world pattern)
+- You’re thinking about error handling, not just the happy path
 
-Example user authentication flow:
+---
 
-1. **User Registration** – Hashes password and stores it in MySQL
-2. **User Login** – Verifies credentials, generates JWT, and returns it
-3. **Protected Routes** – Only accessible with a valid token
+## 2) Authentication and protected routes (JWT + bcrypt)
 
-### 3. Stripe Mock Payment System
+### Auth flow
 
-A mock payment system is implemented using **Stripe's test API**, allowing users to make simulated transactions for testing purposes.
+1. **Register**: hash the password, store hash in MySQL
+2. **Login**: verify password, issue JWT
+3. **Protected endpoints**: require a valid token
 
-Example payment request:
+Example query used for login/user lookup:
+
+```sql
+SELECT * FROM users WHERE username = ?;
+```
+
+**What I’d highlight to an employer**
+
+- Passwords are never stored in plain text (bcrypt hashing)
+- JWT enables stateless authentication for protected routes
+- This pattern scales better than session storage for simple APIs
+
+> Note: In a production version, I would tighten token handling (expiry strategy, refresh tokens, secure storage such as httpOnly cookies, and rate limiting on auth endpoints).
+
+---
+
+## 3) Checkout with Stripe test-mode (mock payments)
+
+I implemented a checkout flow by converting cart items into Stripe line items and creating a checkout session.
 
 ```javascript
 const createCheckoutSession = async (req, res) => {
-  // Get the user ID from the request parameters
   const uid = req.params.uid;
-  // Get the items in the user's cart from the database
+
   const items = await db.promise().query(
     `
     SELECT
@@ -90,22 +153,18 @@ const createCheckoutSession = async (req, res) => {
     [uid]
   );
 
-  // Map the items in the cart to Stripe line items
-  const lineItems = items[0].map((item) => {
-    return {
-      price_data: {
-        currency: "thb",
-        product_data: {
-          name: item.name,
-          description: item.publisher,
-        },
-        unit_amount: item.price * 100,
+  const lineItems = items[0].map((item) => ({
+    price_data: {
+      currency: "thb",
+      product_data: {
+        name: item.name,
+        description: item.publisher,
       },
-      quantity: item.quantity,
-    };
-  });
+      unit_amount: item.price * 100,
+    },
+    quantity: item.quantity,
+  }));
 
-  // Create a checkout session with Stripe
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     line_items: lineItems,
@@ -114,34 +173,75 @@ const createCheckoutSession = async (req, res) => {
     cancel_url: `http://localhost:3000/pay/cancel`,
   });
 
-  // Return the session ID to the client
   res.json({ id: session.id });
 };
 ```
 
-### 4. MySQL Database Integration
+**What this shows**
 
-The backend connects to a **MySQL database** for efficient data management, handling users, transactions, and more.
-
-Example MySQL query for user authentication:
-
-```sql
-SELECT * FROM users WHERE username = ?;
-```
+- You can model real e-commerce flows (cart → checkout session)
+- You can map relational DB results into external API payloads
+- You understand currency/amount conversion details (e.g., multiplying by 100)
 
 ---
 
-## Future Improvements
+## 4) MySQL integration (persistent data + joins)
 
-Some enhancements that could be added include:
+This project uses MySQL for persistence and relational modeling across users, cart, and products. The join in the checkout function is a good example of building a useful data view for a business action (checkout).
 
-- **Two-Factor Authentication (2FA)** for increased security
-- **WebSocket Integration** for real-time updates
+**Why it matters**
+
+- Real apps live and die on clean data modeling
+- Joins and query structure show you can work beyond “toy” CRUD
+
+---
+
+## Challenges (and how I handled them)
+
+- **Keeping frontend and backend decoupled**
+
+  - Solved by using consistent JSON request/response shapes and predictable endpoints.
+
+- **Auth across multiple protected actions**
+
+  - Solved by using JWT and middleware-style checks (token required for protected routes).
+
+- **Checkout data accuracy**
+
+  - Solved by building line items directly from the database cart (source of truth).
+
+---
+
+## Future improvements
+
+If I continued this project, I would add:
+
+- **Two-Factor Authentication (2FA)** for stronger account security
+- **WebSockets** (or SSE) for real-time updates (inventory changes, order status)
+- **Better production hardening**
+
+  - input validation (server-side schema validation)
+  - rate limiting on auth endpoints
+  - structured error responses and logging
+
+- **Deployment**
+
+  - environment variables for secrets
+  - containerization (Docker) and cloud deployment
+
+---
+
+## How to run (high level)
+
+1. Clone the repo: [itcs212_web-server](https://github.com/Purinat33/itcs212_web-server)
+2. Configure environment variables (DB credentials, JWT secret, Stripe keys)
+3. Run backend and frontend separately (decoupled by design)
+4. Test auth flow and Stripe test checkout
 
 ---
 
 ## Conclusion
 
-This project was a great opportunity to work on **modern full-stack development** while ensuring scalability and security. The separation of frontend and backend using the Fetch API makes it modular and flexible for future updates.
+This project demonstrates full-stack fundamentals with an API-first approach: a separate frontend, a Node/Express backend, secure authentication basics, database-driven features, and a test payment flow. The main engineering goal was clean separation and realistic end-to-end behavior.
 
-Check out the source code and contribute: [GitHub Repository](https://github.com/Purinat33/itcs212_web-server).
+---

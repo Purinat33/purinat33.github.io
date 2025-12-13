@@ -1,39 +1,125 @@
 ---
 title: "Healthcare Chatbot Application for MUICT Hackatron 2024"
 categories: [Artificial Intelligence and Machine Learning, Large Language Model]
+toc: true
 ---
 
-# MUICT Hackaton 2024
+# MUICT Hackatron 2024 — Healthcare Chatbot
 
-The purpose of this hackaton event is to create an assistant chatbot specialized in finding illness-specific professionals, making appointments, and general questions related to Siriraj Hospital.
+We built a hospital assistant chatbot for **Siriraj Hospital** to help users:
 
-![Award](/assets/img/hackaton.jpg)
+- find illness-specific professionals,
+- ask general hospital/doctor questions,
+- and support appointment-related inquiries.
 
-## Problem and Solution
+![Award](/assets/img/hackaton.jpg){: .shadow w="800" }
 
-Knowing the tendency of Large Language Models to make up imaginary information, we used a technique called "Retrieval-Augmented Generation" to give our LLM extra information and references in the form of **context**.
+---
 
-By giving the LLM relevant information and instructing it to only use those information to answer, we can reduce the amount of hallucination occurred.
+## What I contributed
 
-## Terminologies
+This project’s biggest challenge wasn’t “writing lots of code” — it was making the chatbot **reliable** in a healthcare setting.
+
+My main contributions were:
+
+- Designing the **system prompt** and response constraints (Thai responses, structured outputs, “use only provided data”)
+- Helping shape the **RAG approach** to reduce hallucinations
+- Defining how the assistant should behave with ambiguous or casual user requests (infer intent → retrieve → answer)
+
+> Why this matters: In domain chatbots, prompt/spec design is part of engineering. It determines safety, accuracy, and user trust.
+
+---
+
+## Problem
+
+Large Language Models can generate answers that sound confident but are **not grounded** in real hospital/doctor information. In a healthcare context, hallucination is a major risk.
+
+---
+
+## Solution: Retrieval-Augmented Generation (RAG)
+
+We used **Retrieval-Augmented Generation (RAG)** to ground the model in hospital-provided doctor data.
+
+**High-level flow**
+
+1. Store doctor information as documents
+2. Convert documents into **embeddings**
+3. Retrieve the most relevant chunks for the user query
+4. Feed retrieved context into the LLM with strict instructions:
+   - respond in Thai
+   - use only the provided data
+   - format information clearly (doctor name, specialty, timetable, etc.)
+
+---
+
+## Why the system prompt mattered
+
+The system prompt acted like a “policy layer” that controlled:
+
+- language (Thai-only)
+- allowed knowledge (only retrieved documents)
+- response structure (easy-to-read doctor info)
+- behavior on vague user questions (infer intent, then answer)
+
+This is the part we iterated the most because it directly impacted:
+
+- hallucination rate
+- correctness of doctor recommendations
+- usability for real users
+
+---
+
+## Core terminology (quick)
 
 ### Embedding
 
-Embedding is the a numerical representation of objects such as text. This is how we are able to retrieve relevant information before prompting, since closely related information would have similar embeddings (e.g. `cat` and `mammal`)
+A numeric representation of text that allows similarity search (e.g., related phrases map closer together in vector space).
 
-### Vector Store
+### Vector store
 
-Vector Store is a type of database that stores the embeddings of the data.
+A database designed to store embeddings and perform fast similarity search.
 
 ### Retriever
 
-It is responsible for retreiving the relevant information from the Vector Store
+The component that finds the most relevant chunks from the vector store based on the user query.
 
-### Embedding Model
+---
 
-Responsible for converting data into embeddings before storage.
+## Implementation notes (what we built)
 
-## References:
+- **Frontend/UI:** Streamlit chat interface
+- **RAG framework:** LlamaIndex
+- **LLM:** OpenAI model (low temperature for stability)
+- **Data source:** hospital doctor information (CSV/MD documents loaded into the index)
 
-1. [What is an Embedding](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-generate-embeddings)
-2. [Vector Store and Retriever](https://aws.amazon.com/what-is/retrieval-augmented-generation/?utm_source=chatgpt.com)
+---
+
+## Example: system prompt strategy (excerpt)
+
+Instead of “be a helpful assistant,” we used strict constraints like:
+
+- “Use only the data provided”
+- “Do not hallucinate”
+- “Always include doctor name + expertise + timetable when relevant”
+- “Infer the user’s intent from casual language”
+
+This helped keep responses aligned with the retrieved context.
+
+---
+
+## What I’d improve next
+
+If we extended this beyond a hackathon prototype:
+
+- Add citation-style output (show which document chunk supported each claim)
+- Add “unknown / not found” handling (explicitly say when data isn’t available)
+- Add evaluation: test set of common patient questions + scoring for groundedness
+- Add safety boundaries (medical advice disclaimer + escalate to human staff)
+
+---
+
+## References
+
+1. What is an Embedding: https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/rag/rag-generate-embeddings
+2. Vector Store and Retriever: https://aws.amazon.com/what-is/retrieval-augmented-generation/
+3. Code Repository: https://github.com/Purinat33/hackathon
