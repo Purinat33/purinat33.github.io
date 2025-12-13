@@ -1,83 +1,100 @@
 ---
 title: "Weather Report GUI application"
 categories: [Software Development, Small Application]
+toc: true
 ---
 
-# Weather Report GUI App: A Practical Project
+# Weather Report GUI Application (Tkinter + WeatherAPI)
 
-## Introduction
+A lightweight desktop GUI that lets users **search cities**, fetch **current weather**, and view **air quality (PM2.5/AQI)** using API calls. Built to practice real-world API integration, JSON parsing, and GUI state handling.
 
-I developed a GUI-based Weather Report application using Python's Tkinter. This application allows users to search for cities with a partial search, fetch weather conditions, and check air quality index (AQI) using an API call. This project not only helped me explore GUI development but also gave me hands-on experience with API integration and data parsing.
+- Repo: https://github.com/Purinat33/Weather-Report-via-API/blob/main/main.py
+- API: https://www.weatherapi.com/
 
-## Objectives
+---
 
-The primary goals of this project were:
+## What the app does
 
-- To create an intuitive GUI application for weather reports.
-- To implement a search function that allows users to find cities with partial input.
-- To fetch and display weather details, including temperature, condition, and AQI.
-- To enhance my understanding of working with APIs, JSON responses, and GUI frameworks.
+### Core features
 
-## Features
+- **City search (partial input):** type part of a city name and retrieve matches
+- **Current weather display:** temperature, condition, humidity, and related details
+- **Air quality (AQI / PM2.5):** shows air quality with clear visual indicators
+- **Simple UI:** built for fast “search → select → view” usage
 
-- **City Search with Autocomplete**: Users can input a partial city name, and the app returns possible matches.
-- **Weather Details**: Fetches and displays real-time weather conditions such as temperature, humidity, and atmospheric conditions.
-- **Air Quality Index (AQI)**: Shows PM2.5 levels with color-coded indicators for easy understanding.
-- **Simple and Intuitive UI**: A user-friendly interface with labels, buttons, and separators for clear data representation.
+---
 
-## Technical Implementation
+## Why I built it
 
-- **Programming Language**: Python
-- **GUI Framework**: Tkinter
-- **API Used**: [WeatherAPI](https://www.weatherapi.com/)
-- **Libraries Used**:
-  - `requests` for making API calls
-  - `tkinter` for GUI elements
-  - `dotenv` for managing API keys securely
-  - `PIL` for handling images
+I wanted a small but realistic project that combines:
 
-## Code Overview
+- GUI event handling (buttons, lists, selection state)
+- external API calls (requests, failures, rate limits)
+- parsing nested JSON safely
+- basic UX decisions (clear layout and readable results)
 
-The application starts with a Tkinter window and a text input for city searches. When a user enters a city name and clicks "Search City," the app makes an API request to fetch matching city names. Users can then select a city, triggering another API request to retrieve detailed weather data.
+---
 
-Here is a breakdown of key functionalities:
+## User flow
 
-- **City Search Function**: Fetches matching cities from the API and displays them in a list.
-- **Weather Fetching Function**: Retrieves real-time weather data based on the selected city ID.
-- **AQI Analysis**: Displays air quality with color-coded labels indicating safety levels.
+1. User enters a partial city name
+2. App calls the API to fetch possible city matches
+3. User selects a city from the list
+4. App requests the selected city’s current weather + air quality
+5. UI updates labels and indicators with the new data
 
-## Practical Usage
+---
 
-This application can be used in various scenarios, such as:
+## Technical design
 
-- **Travel Planning**: Quickly check weather conditions before planning a trip.
-- **Health Awareness**: Monitor AQI levels to determine outdoor activity safety.
-- **Learning Project**: Ideal for beginners to practice API integration and GUI development.
+### Tech stack
 
-## What I've Learned
+- Python
+- Tkinter (GUI)
+- `requests` (HTTP)
+- `dotenv` (API key management)
 
-- **API Integration**: Understanding how to send API requests and parse JSON responses.
-- **GUI Development**: Building interactive applications with Tkinter.
-- **Data Handling**: Extracting and displaying relevant data efficiently.
-- **User Experience Considerations**: Ensuring the application remains simple and informative for end users.
+### Key implementation points (what matters in a GUI + API app)
 
-## Future Improvements
+- **Separation of concerns**
+  - UI components handle display + user events
+  - API functions handle requests + JSON parsing
+- **State management**
+  - selected city and latest response are stored and used to refresh the UI cleanly
+- **Error handling**
+  - invalid city searches, empty results, network errors, and API failures should surface as readable messages (instead of crashing)
 
-To enhance the app, I plan to:
+> In small GUI apps, stability comes from handling “bad input / bad network / bad API response” gracefully.
 
-- Implement caching for API responses to reduce redundant calls.
-- Improve the search function with dynamic suggestions as users type.
-- Add a graphical weather representation using icons.
-- Expand to include a forecast feature for upcoming days.
+---
 
-## Conclusion
+## AQI display (interpretation)
 
-This project was a valuable learning experience, combining API integration with GUI design. It showcases how simple tools like Tkinter can be used to build practical applications. I hope this write-up inspires others to explore similar projects and continue learning.
+The app displays PM2.5 / AQI in a user-friendly way (e.g., color-coded labels). This makes the result readable at a glance and connects the data to a practical decision: “Is it a good idea to be outdoors right now?”
 
-Check out the project source code: [GitHub Repository](https://github.com/Purinat33/Weather-Report-via-API/blob/main/main.py)
+---
 
-## Screenshot:
+## What I learned
 
-![Demo](/assets/img/demo1.png)
+- How to integrate a third-party API and parse nested JSON safely
+- GUI event-driven programming (callbacks, selection events, updating widgets)
+- Basic UX: building a simple flow that feels responsive and clear
+- Securing secrets with environment variables (`.env`) instead of hardcoding keys
 
-![Showcase](/assets/img/demo2.png)
+---
+
+## Future improvements
+
+- **Caching** recent responses to reduce repeated API calls
+- **Live autocomplete** as the user types (debounced search)
+- **Forecast tab** (next 3–7 days)
+- Better visual presentation (icons for conditions, graphs for AQI/temperature)
+- Packaging into an executable (PyInstaller) for easy distribution
+
+---
+
+## Screenshots
+
+![Demo](/assets/img/demo1.png){: .shadow w="850" }
+
+![Showcase](/assets/img/demo2.png){: .shadow w="850" }

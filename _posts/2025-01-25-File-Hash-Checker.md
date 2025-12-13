@@ -1,43 +1,82 @@
 ---
 title: "File Hashing Viewer"
 categories: [Cybersecurity, Encryption]
+toc: true
 ---
 
-# Building a GUI File Integrity Checker: A Personal Cybersecurity Project  
+# File Hashing Viewer — GUI File Integrity Checker
 
-In the world of cybersecurity, ensuring file integrity is crucial, especially when dealing with sensitive data or verifying software downloads. To enhance my understanding of cryptographic hash functions and develop a practical security tool, I started working on a **GUI File Integrity Checker** application.  
+A simple desktop application that computes **MD5**, **SHA-256**, and **CRC32** hashes for any selected file and helps users verify integrity by comparing against known hash values (e.g., from a software publisher).
 
-## **Project Overview**  
-This application provides an easy-to-use graphical interface that allows users to verify the integrity of any file by computing its hash values using **MD5, SHA256, and CRC32**. Additionally, it enables users to manually input expected hash values to check against the computed ones.  
+- Repo: https://github.com/Purinat33/File-Hashing-App/blob/master/fileHashCheck.py
 
-### **Core Features**  
-* **Compute Hashes:** Reads and displays the **MD5, SHA256, and CRC32** hash of any selected file.  
-* **Manual Verification:** Users can manually enter a known hash value for each type to verify against the computed result.  
-* **Integrity Check:** Displays **MATCH** or **NO MATCH** based on whether the entered hash matches the calculated one.  
-* **User-Friendly GUI:** A simple and intuitive interface, making it accessible for both cybersecurity professionals and everyday users.  
+![Demo](/assets/img/demo.png){: .shadow w="900" }
 
-## **How It Works**  
-1. **User selects a file** from the system.  
-2. The application calculates the **MD5, SHA256, and CRC32** hashes.  
-3. If needed, the user **pastes a known hash value** in the respective text boxes.  
-4. The tool **compares the values** and indicates if they match or not.  
+---
 
-## **Why Is This Important?**  
-* **File Integrity Verification** – Ensures files have not been tampered with or corrupted.  
-* **Cybersecurity Awareness** – Highlights the importance of cryptographic hashes in security.  
-* **Practical Application** – Useful for verifying software downloads, forensic analysis, and digital forensics.  
+## What this tool does
 
-## **Tech Stack**  
-I’m currently working on the implementation using:  
-- **Python** (for logic and hash computations)  
-- **Tkinter/PyQt** (for GUI)  
-- **Hashlib & Binascii** (for hash generation)  
+### Core features
 
-## [Project Repository](https://github.com/Purinat33/File-Hashing-App/blob/master/fileHashCheck.py)
+- **Compute hashes** for a selected file: MD5, SHA-256, CRC32
+- **Manual verification**: paste an expected hash and compare
+- **Clear results**: shows **MATCH** / **NO MATCH** for each algorithm
+- **GUI-first workflow**: designed for quick checks without using a terminal
 
-This project has been an excellent way to deepen my understanding of **file integrity mechanisms, hashing algorithms, and GUI development** while building something useful for cybersecurity tasks.  
+---
 
-## Application Interface
+## Why file hashing matters
 
-![Demo](/assets/img/demo.png)
+Hashing is a practical way to detect accidental changes (corruption) and many forms of tampering. Common real-world use cases include:
 
+- verifying downloaded installers against official checksums
+- confirming files weren’t modified during transfer
+- basic forensic workflows (cataloging and checking evidence files)
+
+---
+
+## Threat model and limitations (important)
+
+This tool is useful for **integrity checking**, but the strength depends on the hash type and the threat:
+
+- **SHA-256** is the primary integrity check for security-sensitive use.
+- **MD5** is fast and widely used historically, but it is **not collision-resistant** and should not be relied on for adversarial tampering.
+- **CRC32** is mainly for **error detection** (accidental corruption), not cryptographic security.
+
+> Practical recommendation: if a publisher provides multiple hashes, prefer **SHA-256**. Use MD5/CRC32 for convenience or non-adversarial checks.
+
+---
+
+## How it works
+
+1. User selects a file
+2. The app reads the file and computes:
+   - MD5 (hashlib)
+   - SHA-256 (hashlib)
+   - CRC32 (binascii / zlib)
+3. User optionally pastes expected hashes into the UI
+4. The app compares and displays **MATCH / NO MATCH**
+
+---
+
+## Implementation notes
+
+- **Language:** Python
+- **GUI:** Tkinter (or PyQt, depending on your final choice)
+- **Hashing:** `hashlib` for MD5/SHA-256 and `binascii`/`zlib` for CRC32
+
+### Design choice: chunked file reading (recommended if present)
+
+To support large files without high memory usage, hashes should be computed by reading the file in chunks (instead of loading it all at once). If your code already does this, call it out here—it’s a strong engineering detail.
+
+---
+
+## Future improvements
+
+- Add **copy-to-clipboard** buttons for each hash
+- Add drag-and-drop file selection
+- Add additional algorithms (SHA-1 for legacy checks, SHA-512, BLAKE2)
+- Add an “Export report” option (file path, size, hashes, timestamp)
+- Optional: verify hashes from a checksum file format (e.g., `.sha256`)
+
+---

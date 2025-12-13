@@ -1,60 +1,73 @@
 ---
 title: "File Encryption Technique"
 categories: [Cybersecurity, Encryption]
+toc: true
 ---
 
-# Building a Secure File Encryption and Decryption System
+# File Encryption Technique (Password-Based CLI)
 
-## Introduction
+A command-line tool that encrypts and decrypts text files using **password-based key derivation (PBKDF2-HMAC)** and **symmetric authenticated encryption (Fernet)** from Python’s `cryptography` library.
 
-In the realm of cybersecurity, file encryption is one of the most effective methods to protect sensitive information. Encryption ensures that only authorized individuals can access the content, maintaining confidentiality and data integrity. This article presents a personal cryptography project that involves building a file encryption and decryption tool using the `cryptography` library in Python.
+- Repo: https://github.com/Purinat33/File-Cryptography
 
-## Objective
+---
 
-The project aims to develop a command-line utility that allows users to:
+## What this project does
 
-- Encrypt text files using a password.
-- Decrypt previously encrypted files using the correct password.
-- Ensure secure key derivation using PBKDF2.
+The tool supports two modes:
 
-## Technologies Used
+1. **Encrypt** a text file with a user-provided password
+2. **Decrypt** an encrypted file using the correct password
 
-We utilized the following tools and libraries:
+Under the hood:
 
-- **Python**: The primary programming language for development.
-- **cryptography**: A robust cryptographic library that provides secure implementations of encryption algorithms.
-- **PBKDF2HMAC**: A key derivation function (KDF) used to generate secure keys from passwords.
-- **Fernet**: A symmetric encryption method that ensures confidentiality.
-- **dotenv**: To store and load salt securely from an environment file.
+- A key is derived from the password using **PBKDF2HMAC (SHA-256) + salt**
+- The derived key is used with **Fernet**, which provides:
+  - confidentiality (data is unreadable without the key)
+  - integrity/authenticity (tampering is detected)
 
-## Key Features
+---
 
-### Password-Based Encryption
+## Threat model (what it protects against)
 
-The encryption mechanism uses **PBKDF2HMAC** to derive a key from the user's password. A random **salt** is used to add uniqueness and protect against precomputed attacks.
+This is designed to protect files against:
 
-### Fernet Encryption
+- casual access (someone opening the file normally)
+- accidental leakage (encrypted output is safe to store/share compared to plaintext)
 
-The derived key is used with **Fernet encryption**, ensuring that the data remains secure during encryption and decryption operations.
+It does **not** protect against:
 
-### Empty Line Handling
+- weak passwords (dictionary/brute-force becomes feasible)
+- attackers who obtain both the encrypted file and a guessable password
+- advanced operational security issues (keylogging, malware, compromised machine)
 
-The system processes files while stripping unnecessary empty lines, ensuring data integrity in storage and retrieval.
+---
 
-## Implementation Details
+## Core design choices
 
-### Key Derivation
+### 1) Password → key (PBKDF2)
 
-To generate a strong encryption key, we use the following function:
+Passwords are not used directly as encryption keys. Instead, PBKDF2 “stretches” the password into a strong key.
+
+**Why salt matters**
+
+- Salt prevents attackers from using precomputed rainbow tables across many files/users.
+- The salt must be consistent to decrypt later.
+
+In this implementation, salt is loaded from an environment variable.
+
+### 2) Fernet for encryption
+
+Fernet is a high-level, safe primitive for symmetric encryption that includes authentication (so you can detect wrong keys or tampering).
+
+---
+
+## Key implementation excerpts
+
+### Key derivation
 
 ```python
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-import base64
-from cryptography.fernet import Fernet
-
 def create_key(password: str, salt) -> Fernet:
-    """Generates a Fernet key from a password and salt."""
     bpassword = password.encode()
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
@@ -65,38 +78,35 @@ def create_key(password: str, salt) -> Fernet:
     key = base64.urlsafe_b64encode(kdf.derive(bpassword))
     return Fernet(key=key)
 ```
+````
 
-### File Encryption
-
-The encryption process involves reading a file, stripping empty lines, and writing the encrypted content:
+### File encryption (line-by-line)
 
 ```python
 def encrypt_file(file_name, encrypted_file_name, password, salt):
     with open(file_name, 'r') as f:
-        data = f.readlines()
+        data = [line for line in f.readlines() if line.strip()]
 
-    encryption_key = create_key(password=password, salt=salt)
-    encrypted_data = [encryption_key.encrypt(line.encode()).decode() + '\n' for line in data if line.strip()]
+    fernet = create_key(password=password, salt=salt)
+    encrypted_data = [fernet.encrypt(line.encode()).decode() + "\n" for line in data]
 
     with open(encrypted_file_name, 'w') as f:
         f.writelines(encrypted_data)
 ```
 
-### File Decryption
-
-The decryption process ensures only valid encrypted content is processed, preventing errors due to invalid keys:
+### File decryption with wrong-key handling
 
 ```python
 def decrypt_file(encrypted_file_name, password, decrypted_file_name, salt):
     with open(encrypted_file_name, 'r') as f:
-        data = [line.strip() for line in f.readlines()]
+        data = [line.strip() for line in f.readlines() if line.strip()]
 
-    decryption_key = create_key(password=password, salt=salt)
+    fernet = create_key(password=password, salt=salt)
 
     decrypted = []
     for line in data:
         try:
-            decrypted.append(decryption_key.decrypt(line.encode()).decode())
+            decrypted.append(fernet.decrypt(line.encode()).decode())
         except:
             decrypted.append("ERROR, SKIPPING...\n")
 
@@ -104,34 +114,46 @@ def decrypt_file(encrypted_file_name, password, decrypted_file_name, salt):
         f.writelines(decrypted)
 ```
 
-### Secure Salt Management
+---
 
-The system retrieves a pre-defined **salt** from an environment variable to maintain consistency and security:
+## Limitations (important)
 
-```python
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-salt = os.getenv('SALT').encode()
-```
-
-## Challenges and Considerations
-
-1. **Secure Key Storage**: The salt must be stored securely to ensure key derivation consistency.
-2. **Handling Incorrect Passwords**: An incorrect password should not reveal whether decryption failed due to incorrect credentials or corrupted data.
-3. **Avoiding Empty Lines**: The system ensures that empty lines do not interfere with encryption and decryption.
-
-## Conclusion
-
-This project demonstrates practical cryptography implementation using Python. By leveraging **PBKDF2HMAC** and **Fernet encryption**, we ensure secure file protection with password-based authentication. Future enhancements could include:
-
-- Implementing a graphical user interface (GUI) for ease of use.
-- Adding support for different encryption algorithms.
-- Secure storage of salt and keys using hardware security modules (HSMs) or key management services.
-
-By building this encryption tool, we reinforce our understanding of cryptographic principles and showcase our ability to develop secure software solutions.
+- **Salt storage:** using a fixed salt from `.env` works for learning, but it’s not ideal for real usage.
+- **Text-only behavior:** current approach reads/writes as text and encrypts line-by-line; it’s not suited for binary files.
+- **Error handling:** returning `"ERROR, SKIPPING..."` can produce mixed output; a more secure UX is to fail decryption cleanly.
 
 ---
 
-_This project was built as part of our personal cybersecurity initiatives, highlighting secure coding practices and encryption techniques._
+## Improvements I would make next
+
+### Store salt with the ciphertext (recommended)
+
+Generate a random salt per encryption, then store it in the encrypted output (header or metadata). That way:
+
+- every encryption is unique
+- decryption doesn’t depend on a hidden `.env` value
+
+### Encrypt the full file as bytes
+
+Read the entire file in binary and encrypt once:
+
+- supports any file type
+- preserves exact content (including empty lines)
+
+### Increase KDF strength / add memory-hard KDF
+
+- PBKDF2 is common, but modern systems often prefer Argon2/scrypt for better brute-force resistance.
+- Also tune iterations higher depending on performance constraints.
+
+### Cleaner failure behavior
+
+When decryption fails, return a single clear error message instead of partial output.
+
+---
+
+## How to run
+
+1. Clone the repo: [https://github.com/Purinat33/File-Cryptography](https://github.com/Purinat33/File-Cryptography)
+2. Create a `.env` file with `SALT=...`
+3. Place plaintext files in `./input/`
+4. Run the script and choose encrypt/decrypt mode
