@@ -22,6 +22,6 @@ Most posts include the goal, approach, key decisions, results, and what I’d im
 
 ## Links
 
-- GitHub: https://www.github.com/Purinat33
-- LinkedIn: https://www.linkedin.com/in/purinatpatt/
-- Email: purinat.patt@gmail.com
+- GitHub: [GitHub](https://www.github.com/Purinat33)
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/purinatpatt/)
+- Email: [Email](mailto:purinat.patt@gmail.com)
