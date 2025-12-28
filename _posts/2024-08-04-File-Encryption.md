@@ -2,7 +2,7 @@
 title: "File Encryption Tool (GUI + scrypt + AES-GCM)"
 categories: [Cybersecurity, Encryption]
 toc: true
-pinned: true
+pin: true
 ---
 
 # File Encryption Tool (GUI) — Password-Based Encryption with scrypt + AES-GCM

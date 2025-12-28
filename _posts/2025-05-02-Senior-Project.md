@@ -1,7 +1,7 @@
 ---
 title: "Distributed SIEM with Wazuh (Multi-Site Deployment)"
 categories: [Cybersecurity, SIEM]
-pinned: True
+pin: True
 ---
 
 # Distributed SIEM with Wazuh: Multi-Site Monitoring with Local Autonomy

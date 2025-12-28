@@ -5,7 +5,7 @@ toc: true
 mermaid: true
 # Optional if you keep screenshots here:
 # media_subpath: /assets/img/hpc-billing
-pinned: true
+pin: true
 ---
 
 # High Power Computing Cluster Cost Calculator Webapp
