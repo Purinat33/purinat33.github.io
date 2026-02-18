@@ -59,8 +59,11 @@ The goal is to practice **network segmentation and safe-by-default firewalling**
    - `vuln-lan` (Vulnerable LAN)
 2. Deployed pfSense with 3 interfaces:
    - WAN attached to VirtualBox NAT
+     - Done during pfSense's installation
    - LAN attached to `lab-lan`
+     - Done during pfSense's installation
    - OPT1 attached to `vuln-lan`
+     - Done after pfSense's installation via pfSense's GUI
 3. Configured:
    - Static IPs on LAN/OPT1
    - DHCP on Lab LAN and Vulnerable LAN
@@ -90,8 +93,8 @@ The goal is to practice **network segmentation and safe-by-default firewalling**
 
 ## Future Plans:
 
-- Implementing **DMZ** on the Ubuntu Server
-- Allowing VPN access
+1. [Implementing **DMZ** on the Ubuntu Server](https://purinat33.github.io/posts/Simple-Homelab-2/)
+2. Allowing VPN access
 
 ---
 
