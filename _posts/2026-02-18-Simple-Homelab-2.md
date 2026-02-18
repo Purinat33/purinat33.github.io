@@ -98,12 +98,11 @@ We wanted a place to run services (e.g., a web server) with **tighter containmen
 
 ### Ubuntu Desktop reaching the HTTP server
 
-![VBox](/assets/img/homelab/from_lan.png)
+![VBox](/assets/img/homelab/from_LAN.png)
 
 ### Host PC reaching the HTTP server (Port Forwarding)
 
 ![VBox](/assets/img/homelab/http_windows.png)
-
 
 ---
 
@@ -111,12 +110,9 @@ We wanted a place to run services (e.g., a web server) with **tighter containmen
 
 With the implementation of DMZ, the public-facing server now lives on a different network (DMZ) than the internal, private network (Lab LAN).
 
-
 ---
 
 ## Reference:
 
-* [pfSense Port Forwarding](https://docs.netgate.com/pfsense/en/latest/nat/port-forwards.html)
-* [VirtualBox Port Forwarding](https://nsrc.org/workshops/2014/btnog/raw-attachment/wiki/Track2Agenda/ex-virtualbox-portforward-ssh.htm)
-
-
+- [pfSense Port Forwarding](https://docs.netgate.com/pfsense/en/latest/nat/port-forwards.html)
+- [VirtualBox Port Forwarding](https://nsrc.org/workshops/2014/btnog/raw-attachment/wiki/Track2Agenda/ex-virtualbox-portforward-ssh.htm)
