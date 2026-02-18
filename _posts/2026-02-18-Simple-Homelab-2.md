@@ -49,7 +49,7 @@ We wanted a place to run services (e.g., a web server) with **tighter containmen
 
 ### 2. Configure DMZ IPv4 + DHCP
 
-![DHCP](/assets/img/homelab/pre_dmz_4.png)
+![DHCP](/assets/img/homelab/pre_dmz_4_DHCP.png)
 
 ---
 
