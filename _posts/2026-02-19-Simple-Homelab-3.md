@@ -1,5 +1,5 @@
 ---
-title: "Simple Homelab Creation Part 2"
+title: "Simple Homelab Creation Part 3"
 categories: [System Design, Network]
 toc: true
 ---
