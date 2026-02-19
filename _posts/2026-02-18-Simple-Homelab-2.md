@@ -9,6 +9,7 @@ toc: true
 This document describes how we added a **DMZ network** to our single-PC VirtualBox homelab to separate “public-facing services” from the trusted Lab LAN and the Vulnerable LAN.
 
 - [Previous Part](https://purinat33.github.io/posts/Simple-Homelab-1/)
+- [Next Part](https://purinat33.github.io/posts/Simple-Homelab-3/)
 
 ---
 
@@ -105,6 +106,16 @@ We wanted a place to run services (e.g., a web server) with **tighter containmen
 ![VBox](/assets/img/homelab/http_windows.png)
 
 ---
+
+## Current Limitation (VirtualBox NAT Inbound)
+
+Even though pfSense has a WAN port forward configured, our WAN interface sits behind **VirtualBox NAT**.
+
+**Limitation:** We are **not** configuring VirtualBox NAT port forwarding yet, so inbound traffic from outside the host will not reach pfSense WAN.
+
+Switching VirtualBox WAN to **Bridged** would enable true inbound connections.
+
+--
 
 ## Summary
 

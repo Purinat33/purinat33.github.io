@@ -6,6 +6,8 @@ toc: true
 
 # Single-PC Homelab: pfSense Segmentation (Lab LAN + Vulnerable LAN)
 
+- [Next Part](https://purinat33.github.io/posts/Simple-Homelab-2/)
+
 ## Overview
 
 This project documents a small homelab built on a single Windows 11 PC using VirtualBox.  
@@ -88,13 +90,6 @@ The goal is to practice **network segmentation and safe-by-default firewalling**
 
 **Vulnerable LAN rules (block Vuln → Lab and Vuln → Internet):**
 ![Vuln LAN Rules](/assets/img/homelab/rules_vuln.png)
-
----
-
-## Future Plans:
-
-1. [Implementing **DMZ** on the Ubuntu Server](https://purinat33.github.io/posts/Simple-Homelab-2/)
-2. Allowing VPN access
 
 ---
 
